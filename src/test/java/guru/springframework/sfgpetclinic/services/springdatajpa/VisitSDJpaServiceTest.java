@@ -48,8 +48,8 @@ class VisitSDJpaServiceTest {
         Set<Visit> foundVisits = service.findAll();
 
         // then
-        assertEquals(allVisits.size(), foundVisits.size());
         then(visitRepository).should().findAll();
+        assertEquals(allVisits.size(), foundVisits.size());
     }
 
     @Test
@@ -64,10 +64,9 @@ class VisitSDJpaServiceTest {
         Visit foundVisit = service.findById(visit.getId());
 
         // then
+        then(visitRepository).should().findById(visit.getId());
         assertThat(foundVisit).isNotNull();
         assertEquals(visit.getId(), foundVisit.getId());
-        then(visitRepository).should().findById(visit.getId());
-
     }
 
     @Test
@@ -82,8 +81,8 @@ class VisitSDJpaServiceTest {
         Visit persistedVisit = service.save(visit);
 
         // then
-        assertEquals(visit.getDescription(), persistedVisit.getDescription());
         then(visitRepository).should(atLeastOnce()).save(visit);
+        assertEquals(visit.getDescription(), persistedVisit.getDescription());
     }
 
     @Test
@@ -97,7 +96,6 @@ class VisitSDJpaServiceTest {
 
         // then
         then(visitRepository).should(times(1)).delete(visit);
-
     }
 
     @Test
@@ -111,6 +109,5 @@ class VisitSDJpaServiceTest {
 
         // then
         then(visitRepository).should(times(1)).deleteById(visit.getId());
-
     }
 }
