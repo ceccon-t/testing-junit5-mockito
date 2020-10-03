@@ -15,6 +15,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +31,7 @@ class VisitSDJpaServiceTest {
     @Test
     void findAll() {
 
+        // given
         Visit visitA = new Visit();
         Visit visitB = new Visit();
         Visit visitC = new Visit();
@@ -38,59 +41,76 @@ class VisitSDJpaServiceTest {
         allVisits.add(visitB);
         allVisits.add(visitC);
 
-        when(visitRepository.findAll()).thenReturn(allVisits);
+//        when(visitRepository.findAll()).thenReturn(allVisits);
+        given(visitRepository.findAll()).willReturn(allVisits);
 
+        // when
         Set<Visit> foundVisits = service.findAll();
 
+        // then
         assertEquals(allVisits.size(), foundVisits.size());
+        then(visitRepository).should().findAll();
     }
 
     @Test
     void findById() {
+        // given
         Visit visit = new Visit();
         visit.setId(1l);
 
-        when(visitRepository.findById(visit.getId())).thenReturn(Optional.of(visit));
+        given(visitRepository.findById(visit.getId())).willReturn(Optional.of(visit));
 
+        // when
         Visit foundVisit = service.findById(visit.getId());
 
+        // then
         assertThat(foundVisit).isNotNull();
         assertEquals(visit.getId(), foundVisit.getId());
+        then(visitRepository).should().findById(visit.getId());
 
     }
 
     @Test
     void save() {
+        // given
         Visit visit = new Visit();
         visit.setDescription("A visit");
 
-        when(visitRepository.save(visit)).thenReturn(visit);
+        given(visitRepository.save(visit)).willReturn(visit);
 
+        // when
         Visit persistedVisit = service.save(visit);
 
+        // then
         assertEquals(visit.getDescription(), persistedVisit.getDescription());
-        verify(visitRepository, atLeastOnce()).save(visit);
+        then(visitRepository).should(atLeastOnce()).save(visit);
     }
 
     @Test
     void delete() {
+        // given
         Visit visit = new Visit();
         visit.setDescription("A visit");
 
+        // when
         service.delete(visit);
 
-        verify(visitRepository, times(1)).delete(visit);
+        // then
+        then(visitRepository).should(times(1)).delete(visit);
 
     }
 
     @Test
     void deleteById() {
+        // given
         Visit visit = new Visit();
         visit.setId(1l);
 
+        // when
         service.deleteById(visit.getId());
 
-        verify(visitRepository, times(1)).deleteById(visit.getId());
+        // then
+        then(visitRepository).should(times(1)).deleteById(visit.getId());
 
     }
 }
