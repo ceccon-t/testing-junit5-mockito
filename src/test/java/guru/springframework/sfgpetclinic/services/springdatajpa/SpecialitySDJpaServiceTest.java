@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
@@ -159,6 +160,46 @@ class SpecialitySDJpaServiceTest {
         assertThrows(RuntimeException.class, () -> specialityRepository.delete(new Speciality()));
 
         then(specialityRepository).should().delete(any());
+    }
+
+    @Test
+    void testSaveLambda() {
+        // given
+        final String MATCH_ME = "MATCH_ME";
+        Speciality speciality = new Speciality();
+        speciality.setDescription(MATCH_ME);
+
+        Speciality savedSpeciality = new Speciality();
+        savedSpeciality.setId(1l);
+
+        // need mock to only return on match MATCH_ME string
+        given(specialityRepository.save(argThat(argument -> argument.getDescription().equals(MATCH_ME)))).willReturn(savedSpeciality);
+
+        // when
+        Speciality returnedSpeciality = service.save(speciality);
+
+        // then
+        assertThat(returnedSpeciality.getId()).isEqualTo(1l);
+    }
+
+    @Test
+    void testSaveLambdaNoMatch() {
+        // given
+        final String MATCH_ME = "MATCH_ME";
+        Speciality speciality = new Speciality();
+        speciality.setDescription("Not a match");
+
+        Speciality savedSpeciality = new Speciality();
+        savedSpeciality.setId(1l);
+
+        // need mock to only return on match MATCH_ME string
+        lenient().when(specialityRepository.save(argThat(argument -> argument.getDescription().equals(MATCH_ME)))).thenReturn(savedSpeciality);
+
+        // when
+        Speciality returnedSpeciality = service.save(speciality);
+
+        // then
+        assertNull(returnedSpeciality);
     }
 
 }
