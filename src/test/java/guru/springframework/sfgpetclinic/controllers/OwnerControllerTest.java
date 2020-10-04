@@ -10,12 +10,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.atLeastOnce;
 
 @ExtendWith(MockitoExtension.class)
 class OwnerControllerTest {
     private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
+    private static final String BASE_REDIRECT_CREATION_FORM = "redirect:/owners/";
 
     @Mock
     OwnerService ownerService;
@@ -28,6 +31,18 @@ class OwnerControllerTest {
 
     @Test
     void processCreationForm() {
+        // given
+        Long ownerId = 5l;
+        Owner owner = new Owner(ownerId, "John", "Doe");
+        given(bindingResult.hasErrors()).willReturn(false);
+        given(ownerService.save(any(Owner.class))).willReturn(owner);
+
+        // when
+        String route = controller.processCreationForm(owner, bindingResult);
+
+        // then
+        then(ownerService).should(atLeastOnce()).save(any(Owner.class));
+        assertEquals(BASE_REDIRECT_CREATION_FORM + ownerId, route);
 
     }
 
