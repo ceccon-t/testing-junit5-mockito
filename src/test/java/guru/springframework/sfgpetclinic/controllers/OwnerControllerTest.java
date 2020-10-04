@@ -20,8 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -78,7 +77,7 @@ class OwnerControllerTest {
         // then
         assertThat(stringArgumentCaptor.getValue()).isEqualToIgnoringCase("%Buck%");
         assertThat(viewName).isEqualToIgnoringCase("redirect:/owners/1");
-
+        verifyZeroInteractions(model);
     }
 
     @Test
@@ -92,6 +91,7 @@ class OwnerControllerTest {
         // then
         assertThat(stringArgumentCaptor.getValue()).isEqualToIgnoringCase("%DontFindMe%");
         assertThat(viewName).isEqualToIgnoringCase("owners/findOwners");
+        verifyZeroInteractions(model);
     }
 
     @Test
@@ -109,7 +109,8 @@ class OwnerControllerTest {
 
         // in order assertions
         inOrder.verify(ownerService).findAllByLastNameLike(anyString());
-        inOrder.verify(model).addAttribute(anyString(), anyList());
+        inOrder.verify(model, times(1)).addAttribute(anyString(), anyList());
+        verifyNoMoreInteractions(model);
     }
 
     @Test
